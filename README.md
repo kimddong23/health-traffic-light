@@ -45,33 +45,78 @@
 - **아이콘**: Lucide React
 - **라우팅**: React Router DOM
 
-## 설치 및 실행
+## 로컬 실행 방법
 
-### 요구사항
-- Node.js 18.0.0 이상
-- npm 또는 yarn
+### 1단계: Node.js 설치 확인
 
-### 설치
+먼저 Node.js가 설치되어 있는지 확인합니다. 터미널(명령 프롬프트)을 열고 다음 명령어를 입력하세요:
+
 ```bash
+node --version
+```
+
+버전이 표시되면 설치되어 있는 것입니다. 만약 설치되어 있지 않다면 [Node.js 공식 사이트](https://nodejs.org/ko)에서 LTS 버전을 다운로드하여 설치하세요.
+
+### 2단계: 프로젝트 다운로드
+
+**방법 A: Git으로 클론하기**
+```bash
+git clone https://github.com/kimddong23/health-traffic-light.git
 cd health-traffic-light
+```
+
+**방법 B: ZIP 파일로 다운로드하기**
+1. GitHub 저장소 페이지에서 녹색 `Code` 버튼 클릭
+2. `Download ZIP` 선택
+3. 다운로드된 파일 압축 해제
+4. 터미널에서 압축 해제된 폴더로 이동
+
+### 3단계: 의존성 패키지 설치
+
+프로젝트 폴더에서 다음 명령어를 실행하여 필요한 패키지들을 설치합니다:
+
+```bash
 npm install
 ```
 
-### 개발 서버 실행
+설치가 완료될 때까지 잠시 기다려주세요 (1-2분 소요).
+
+### 4단계: 개발 서버 실행
+
 ```bash
 npm run dev
 ```
-브라우저에서 `http://localhost:5173` 접속
 
-### 프로덕션 빌드
+실행 후 터미널에 다음과 같은 메시지가 표시됩니다:
+```
+  VITE v5.x.x  ready in xxx ms
+
+  ➜  Local:   http://localhost:5173/
+```
+
+### 5단계: 브라우저에서 확인
+
+웹 브라우저를 열고 주소창에 다음 주소를 입력하세요:
+
+```
+http://localhost:5173
+```
+
+건강 신호등 앱이 실행됩니다.
+
+### 서버 종료 방법
+
+터미널에서 `Ctrl + C`를 누르면 개발 서버가 종료됩니다.
+
+### 프로덕션 빌드 (배포용)
+
+실제 서버에 배포할 파일을 생성하려면:
+
 ```bash
 npm run build
 ```
 
-### 빌드 미리보기
-```bash
-npm run preview
-```
+빌드된 파일은 `dist/` 폴더에 생성됩니다.
 
 ## 프로젝트 구조
 
