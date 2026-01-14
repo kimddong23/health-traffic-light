@@ -158,19 +158,136 @@ health-traffic-light/
 └── vite.config.ts
 ```
 
-## 데이터 연동
+## 실제 서비스 구현 가이드
 
-현재는 `src/data/mockData.ts`에 샘플 데이터가 포함되어 있습니다. 실제 서비스 구현 시 다음 API와 연동할 수 있습니다:
+현재는 `src/data/mockData.ts`에 예시 데이터가 포함되어 있습니다. 실제 서비스로 발전시키려면 아래 단계를 따라 구현합니다.
 
-### 공공데이터 포털 API (예시)
-- 건강보험공단 건강검진 데이터
-- 국민건강보험 투약 정보
-- 병원 정보 API
+### 1단계: 공공데이터 API 연동
 
-### 데이터 연동 방법
-1. `src/data/` 폴더에 API 호출 로직 추가
-2. 각 페이지에서 mock 데이터 대신 API 데이터 사용
-3. 필요 시 상태 관리 라이브러리(Zustand, Redux 등) 도입
+**활용 가능한 공공데이터 API**
+- 건강보험공단 건강검진 결과 조회 API
+- 국민건강보험 투약 정보 API
+- 전국 병원/약국 정보 API (건강보험심사평가원)
+- 응급의료기관 정보 API
+
+**구현 방법**
+1. [공공데이터포털](https://www.data.go.kr)에서 API 활용 신청
+2. `src/services/` 폴더 생성 후 API 호출 모듈 작성
+3. 예시 코드:
+```typescript
+// src/services/healthApi.ts
+const API_KEY = 'your-api-key';
+
+export async function fetchHealthCheckup(userId: string) {
+  const response = await fetch(
+    `https://api.example.com/checkup?userId=${userId}&apiKey=${API_KEY}`
+  );
+  return response.json();
+}
+```
+
+### 2단계: 건강 데이터 분석 로직 개발
+
+**신호등 상태 판정 로직**
+- 각 건강 지표별 정상 범위 기준 정의
+- 기준값과 실제 측정값 비교하여 안전/주의/위험 판정
+- `src/utils/healthAnalyzer.ts` 파일 생성하여 분석 로직 구현
+
+```typescript
+// src/utils/healthAnalyzer.ts
+export function analyzeBloodPressure(systolic: number, diastolic: number) {
+  if (systolic < 120 && diastolic < 80) return 'safe';
+  if (systolic < 140 && diastolic < 90) return 'caution';
+  return 'danger';
+}
+```
+
+**건강 나이 계산 알고리즘**
+- 실제 나이 대비 각 지표의 건강 상태를 종합하여 건강 나이 산출
+- 의학적 근거 기반의 가중치 적용 필요
+
+### 3단계: 사용자 인증 및 데이터 보안
+
+**인증 시스템 구현**
+- 본인인증(휴대폰, 공동인증서 등) 연동
+- JWT 토큰 기반 세션 관리
+- `src/services/auth.ts` 모듈 구현
+
+**개인정보 보호**
+- HTTPS 통신 필수
+- 민감 데이터 암호화 저장
+- 개인정보처리방침 수립
+
+### 4단계: 병원 정보 연동
+
+**위치 기반 병원 검색**
+- Geolocation API로 현재 위치 획득
+- 병원 정보 API와 연동하여 주변 병원 검색
+- 카카오맵/네이버맵 API로 지도 표시
+
+```typescript
+// src/services/hospitalApi.ts
+export async function fetchNearbyHospitals(lat: number, lng: number) {
+  const response = await fetch(
+    `https://api.example.com/hospitals?lat=${lat}&lng=${lng}&radius=5000`
+  );
+  return response.json();
+}
+```
+
+### 5단계: 알림 시스템 구현
+
+**푸시 알림**
+- Firebase Cloud Messaging(FCM) 연동
+- Service Worker 등록
+- 위험 징후 감지 시 자동 알림 발송
+
+**알림 트리거 조건**
+- 건강 지표가 위험 수준 도달 시
+- 정기 검진 일정 도래 시
+- 복용 약물 알림 시간
+
+### 6단계: 상태 관리 도입
+
+대규모 데이터 관리를 위해 상태 관리 라이브러리 도입을 권장합니다:
+
+```bash
+npm install zustand
+```
+
+```typescript
+// src/stores/healthStore.ts
+import { create } from 'zustand';
+
+interface HealthState {
+  metrics: HealthMetric[];
+  fetchMetrics: () => Promise<void>;
+}
+
+export const useHealthStore = create<HealthState>((set) => ({
+  metrics: [],
+  fetchMetrics: async () => {
+    const data = await fetchHealthCheckup();
+    set({ metrics: data });
+  },
+}));
+```
+
+### 파일 구조 (실제 서비스용)
+
+```
+src/
+├── services/          # API 호출 모듈
+│   ├── healthApi.ts   # 건강검진 API
+│   ├── hospitalApi.ts # 병원 정보 API
+│   └── auth.ts        # 인증 서비스
+├── utils/             # 유틸리티 함수
+│   ├── healthAnalyzer.ts  # 건강 분석 로직
+│   └── encryption.ts      # 암호화 유틸
+├── stores/            # 상태 관리
+│   └── healthStore.ts
+└── ...
+```
 
 ## 디자인 원칙
 
